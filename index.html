@@ -55,18 +55,117 @@
     <button>Trigger a Global Error</button>
   </section>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "bee2a4596c8247ad936b5d1b84edac14"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+
+  <script>
+    class ValidationError extends Error {
+      constructor(message) {
+        super(name);
+        this.message = "Incorrect input! Must be a number!" // (1)
+      }
+    }
+
+    const label = 'This is a console group demo.';
     let calculateBtn = document.querySelector('#calculate');
+
     calculateBtn.addEventListener('click', () => {
       let output = document.querySelector('output');
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      TrackJS.track('Testing TrackJS!');
+      try {
+        if (firstNum == "" || secondNum == "") {
+          throw new ValidationError;
+        }
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      }
+      catch (err) {
+        
+        console.error(err.message);
+      }
+      finally {
+        console.log('Thanks for using the calculator!')
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
     // TODO - Make buttons functional
+
+    document.querySelectorAll('#error-btns > button')[0].addEventListener('click', () => {
+      console.log('This is the console log demo.');
+    });
+
+    document.querySelectorAll('#error-btns > button')[1].addEventListener('click', () => {
+      console.error('This is a console log error demo.');
+    });
+
+    document.querySelectorAll('#error-btns > button')[2].addEventListener('click', () => {
+      console.dir(document.head);
+    });
+
+    document.querySelectorAll('#error-btns > button')[3].addEventListener('click', () => {
+      console.dirxml(document.head);
+    });
+
+    document.querySelectorAll('#error-btns > button')[4].addEventListener('click', () => {
+      console.group(label);
+    });
+
+    document.querySelectorAll('#error-btns > button')[5].addEventListener('click', () => {
+      console.groupEnd(label);
+    });
+
+    document.querySelectorAll('#error-btns > button')[6].addEventListener('click', () => {
+      console.table([
+      {
+        first: 'This',
+        last: 'is',
+      },
+      {
+        first: 'a',
+        last: 'console',
+      },
+      {
+        first: 'table',
+        last: 'demo',
+      }
+    ]);
+    });
+
+    document.querySelectorAll('#error-btns > button')[7].addEventListener('click', () => {
+      console.time();
+    });
+
+    document.querySelectorAll('#error-btns > button')[8].addEventListener('click', () => {
+      console.timeEnd();
+    });
+  
+    document.querySelectorAll('#error-btns > button')[9].addEventListener('click', () => {
+
+      const first = () => { second(); };
+      const second = () => { third(); };
+      const third = () => { fourth(); };
+      const fourth = () => { console.trace(); };
+      first();
+    });
+
+    document.querySelectorAll('#error-btns > button')[10].addEventListener('click', () => {
+      throw new Error('This is an onerror test.');
+    });
+
+    window.onerror = function (msg, url, lineNo, columnNo, error) {
+      console.log('Uh oh, not working!');
+
+      return false;
+    }
+    
   </script>
 </body>
 </html>
